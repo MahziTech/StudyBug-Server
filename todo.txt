@@ -1,0 +1,9 @@
+file/image storage with S3
+auth
+ai
+oauth/ssi/sso
+tests
+define various subscription levels
+store some sort of user activity data
+file uploads limit
+ADD MIDDLEWARE FOR CASCADING DELETES IN EACH NEEDED MODEL
