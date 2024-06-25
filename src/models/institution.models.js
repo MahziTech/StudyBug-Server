@@ -4,19 +4,19 @@ import mongoose from "mongoose";
 const InstitutionSchema = mongoose.Schema({
     name: {
         type: String,
-        default: "",
-        required: true,
-        min: 1,
-        max: 60
+        default: ""
+    },
+    address: {
+        type: String,
+        default: ""
     },
     profilePicturePath: {
         type: String,
-        default: ""
+        default: "",
     },
     subscription: {
         type: Object,
         default: null,
-        required: true
     },
 }, { timestamps: true })
 

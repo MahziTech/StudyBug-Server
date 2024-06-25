@@ -7,7 +7,7 @@ const DocumentSchema = mongoose.Schema({
         default: "",
         required: true,
         min: 1,
-        max: 60
+        max: 100
     },
     filePath: {
         type: String,
@@ -18,7 +18,7 @@ const DocumentSchema = mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: "StudySession",
         default: null,
-        
+        required: true
     },
     user: {
         type: mongoose.Schema.Types.ObjectId,

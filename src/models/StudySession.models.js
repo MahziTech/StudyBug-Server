@@ -7,12 +7,13 @@ const StudySessionSchema = mongoose.Schema({
         default: "",
         required: true,
         min: 1,
-        max: 60
+        max: 100
     },
     user: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "User",
-        default: null
+        default: null,
+        required: true
     }
 }, { timestamps: true })
 

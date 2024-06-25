@@ -1,0 +1,15 @@
+CUSTOM_ERR_MSG = "You tried signing in with a different authentication method than the one you used during signup. 
+Please try again using your original authentication method."
+
+
+
+creating an account with oauth while already having an account created with oauth: "automatically login in instead"
+creating an account with form while already having an account created with oauth: "account already exists"
+creating an account with form while already having an account created with form: "account already exists"
+creating an account with oauth while already having an account created with form: "account already exists"
+
+
+logging into an account with oauth while already having an account created with oauth: "normal login in"
+logging into an account with form while already having an account created with oauth: CUSTOM_ERR_MSG
+logging into an account with form while already having an account created with form: "normal log in"
+logging into an account with oauth while already having an account created with form: CUSTOM_ERR_MSG

@@ -19,6 +19,7 @@ const QuizSchema = mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: "StudySession",
         default: null,
+        required: true
     },
     questions: {
         type: Array,

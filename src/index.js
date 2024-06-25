@@ -5,6 +5,7 @@ import cors from "cors"
 import dotenv from "dotenv"
 import helmet from "helmet";
 import morgan from "morgan";
+import ApiRouter from "./api.js";
 
 
 dotenv.config()
@@ -22,12 +23,13 @@ app.get("/", (req, res) => {
     res.send("Welcome to StudyBug...")
 })
 
+app.use("/api", ApiRouter)
 
 const PORT = process.env.PORT || 6001
 
 
-mongoose.connect(process.env.MONGO_URL).then(app.listen(PORT, () => {
+mongoose.connect(process.env.MONGO_URL, { socketTimeoutMS: 45000 }).then(app.listen(PORT, () => {
     console.log("connected to mongo database")
     console.log("server running at PORT: " + PORT)
 }))
-.catch(err => console.log("FAILED TO CONNECT TO DATABASE\n" + err))
+.catch(err => console.log("\nFAILED TO CONNECT TO DATABASE\n" + err))

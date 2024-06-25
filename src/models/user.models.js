@@ -6,19 +6,14 @@ const UserSchema = mongoose.Schema({
         type: String,
         default: "",
         min: 2,
-        max: 50
+        max: 50,
     },
     lastName: {
         type: String,
         default: "",
         min: 2,
-        max: 50
-    },
-    password: {
-        type: String,
-        default: "",
-        min: 8,
-        max: 70
+        max: 50,
+
     },
     email: {
         type: String,
@@ -27,29 +22,34 @@ const UserSchema = mongoose.Schema({
         max: 50,
         unique: true
     },
+    password: {
+        type: String,
+        default: "",
+        min: 8,
+        max: 70,
+    },
     telephone: {
         type: String,
         default: "",
         min: 5,
-        max: 20
+        max: 20,
     },
     oauthProvider: {
         type: String,
-        default: ""
+        default: null,
     },
     profilePicturePath: {
         type: String,
-        default: ""
-    },
-    institution: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "Institution",
-        default: null
+        default: "",
     },
     subscription: {
         type: Object,
         default: null,
-        required: true
+    },
+    institution: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Institution",
+        default: null,
     },
 }, { timestamps: true })
 

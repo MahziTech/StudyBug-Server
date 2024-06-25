@@ -6,19 +6,22 @@ const UserSchema = mongoose.Schema({
         type: String,
         default: "",
         min: 2,
-        max: 50
+        max: 50,
+        required: true
     },
     lastName: {
         type: String,
         default: "",
         min: 2,
-        max: 50
+        max: 50,
+        required: true
     },
     password: {
         type: String,
         default: "",
         min: 8,
-        max: 70
+        max: 70,
+        required: true
     },
     email: {
         type: String,
@@ -31,16 +34,19 @@ const UserSchema = mongoose.Schema({
         type: String,
         default: "",
         min: 5,
-        max: 20
+        max: 20,
+        required: true
     },
     profilePicturePath: {
         type: String,
-        default: ""
+        default: "",
+        required: true
     },
     institution: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "Institution",
-        default: null
+        default: null,
+        required: true
     }
 }, { timestamps: true })
 

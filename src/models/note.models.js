@@ -19,6 +19,7 @@ const NoteSchema = mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: "StudySession",
         default: null,
+        required: true
     },
     user: {
         type: mongoose.Schema.Types.ObjectId,
