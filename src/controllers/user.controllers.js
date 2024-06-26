@@ -1,8 +1,10 @@
+import InstitutionDatabase from "../models/institution.models.js";
 import UserDatabase from "../models/user.models.js";
 import bcrypt from "bcrypt"
 
 
-//!DO EDITUSER INCLUDE INSTITUTUON
+//todo: DO EDITUSER SUBSCRIPTION, PASSWORD, PICTURE
+//todo: DO DELETE USER
 
 export const createUser = async(req, res) => {
     try {
@@ -75,6 +77,88 @@ export const getUser = async(req, res) => {
         }
 
         return res.status(404).json({ ok: false, error: "user not found" })
+    } catch (error) {
+        console.log(error)
+        return res.status(500).json({ ok: false, error: "Internal server error" })
+    }
+}
+
+export const editUserMainDetails = async(req, res) => {
+    try {
+        const { id, updates } = req.body
+        const allowedFields = ["firstName", "lastName", "telephone"]
+        const user = await UserDatabase.findById(id)
+
+        if(!user) {
+            return res.status(404).json({ ok: false, "error": "The user could not be found" })
+        }
+
+        const unallowedField = updates.find(update => !allowedFields.includes(update.field))?.field
+
+        if(unallowedField) {
+            return res.status(403).json({ ok: false, error: `You can't change the ${unallowedField} field or this is the wrong way to do it.` })
+        }
+        updates.forEach(({ field, value }) => {
+            user[field] = value
+        })
+
+        await user.save()
+
+        const updatedUser = await UserDatabase.findById(id)
+        return res.status(200).json({ ok: true, body: updatedUser })
+    } catch (error) {
+        console.log(error)
+        return res.status(500).json({ ok: false, error: "Internal server error" })
+    }
+}
+
+export const addUserToInstitution = async(req, res) => {
+    try {
+        const { userId, institutionId, code } = req.body
+
+        const user = await UserDatabase.findById(userId)
+        if(!user) {
+            return res.status(404).json({ ok: false, error: "user not found" })
+        }
+
+        if(user.institution) {
+            return res.status(400).json({ ok: false, error: "You are already part of an institution. If you wish to change institutions, exit out of your current one and join a new one" })
+        }
+
+        const institution = await InstitutionDatabase.findById(institutionId)
+        if(!institution) {
+            return res.status(404).json({ ok: false, error: "institution not found" })
+        }
+
+        if(code !== institution.code) {
+            return res.status(400).json({ ok: false, error: "Invalid code" })
+        } else {
+            user.institution = institutionId
+            await user.save()
+            return res.status(201).json({ ok: true, message: "You were successfully added to "+institution.name })
+        }
+    } catch (error) {
+        console.log(error)
+        return res.status(500).json({ ok: false, error: "Internal server error" })
+    }
+}
+
+export const removeUserFromInstitution = async(req, res) => {
+    try {
+        const { userId } = req.params
+
+        const user = await UserDatabase.findById(userId)
+        if(!user) {
+            return res.status(404).json({ ok: false, error: "user not found" })
+        }
+
+        if(!user.institution) {
+            return res.status(400).json({ ok: false, error: "You are not part of an institution" })
+        }
+
+        user.institution = null
+        await user.save()
+        return res.status(201).json({ ok: true, message: "You were successfully removed from the institution" })
     } catch (error) {
         console.log(error)
         return res.status(500).json({ ok: false, error: "Internal server error" })

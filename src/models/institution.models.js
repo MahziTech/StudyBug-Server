@@ -14,6 +14,10 @@ const InstitutionSchema = mongoose.Schema({
         type: String,
         default: "",
     },
+    code: {
+        type: String,
+        default: "",
+    },
     subscription: {
         type: Object,
         default: null,
