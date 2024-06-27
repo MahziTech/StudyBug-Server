@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 
 
-const StudySessionSchema = mongoose.Schema({
+const StudyUnitSchema = mongoose.Schema({
     name: {
         type: String,
         default: "",
@@ -18,5 +18,5 @@ const StudySessionSchema = mongoose.Schema({
 }, { timestamps: true })
 
 
-const StudySession = mongoose.model("StudySession", StudySessionSchema)
-export default StudySession
+const StudyUnit = mongoose.model("StudyUnit", StudyUnitSchema)
+export default StudyUnit

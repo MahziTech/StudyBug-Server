@@ -4,7 +4,7 @@ import bcrypt from "bcrypt"
 
 
 //todo: DO EDITUSER SUBSCRIPTION, PASSWORD, PICTURE
-//todo: DO DELETE USER
+//todo: DO DELETE and signout USER
 
 export const createUser = async(req, res) => {
     try {

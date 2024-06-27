@@ -10,6 +10,20 @@ const InstitutionSchema = mongoose.Schema({
         type: String,
         default: ""
     },
+    password: {
+        type: String,
+        default: "",
+        min: 8,
+        max: 70,
+        required: true
+    },
+    email: {
+        type: String,
+        required: true,
+        min: 8,
+        max: 50,
+        unique: true
+    },
     profilePicturePath: {
         type: String,
         default: "",

@@ -28,7 +28,7 @@ app.use("/api", ApiRouter)
 const PORT = process.env.PORT || 6001
 
 
-mongoose.connect(process.env.MONGO_URL, { socketTimeoutMS: 45000 }).then(app.listen(PORT, () => {
+mongoose.connect(process.env.MONGO_URL, { socketTimeoutMS: 45000, serverSelectionTimeoutMS: 50000 }).then(app.listen(PORT, () => {
     console.log("connected to mongo database")
     console.log("server running at PORT: " + PORT)
 }))

@@ -9,15 +9,15 @@ import {
 } from "../controllers/user.controllers.js"
 
 
-const UserRouter = express.Router()
+const UsersRouter = express.Router()
 
 
-UserRouter.post("/create", createUser)
-UserRouter.post("/login", loginUser)
-UserRouter.get("/id/:id", getUser)
-UserRouter.post("/edit/main-details", editUserMainDetails)
-UserRouter.post("/edit/institution/add", addUserToInstitution)
-UserRouter.post("/edit/institution/remove/:userId", removeUserFromInstitution)
+UsersRouter.post("/create", createUser)
+UsersRouter.post("/login", loginUser)
+UsersRouter.get("/id/:id", getUser)
+UsersRouter.post("/edit/main-details", editUserMainDetails)
+UsersRouter.post("/edit/institution/add", addUserToInstitution)
+UsersRouter.post("/edit/institution/remove/:userId", removeUserFromInstitution)
 
 
-export default UserRouter
+export default UsersRouter

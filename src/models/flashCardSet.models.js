@@ -14,9 +14,9 @@ const FlashCardSetSchema = mongoose.Schema({
         default: [],
         required: true,
     },
-    studySession: {
+    studyUnit: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: "StudySession",
+        ref: "StudyUnit",
         default: null,
         required: true
     },

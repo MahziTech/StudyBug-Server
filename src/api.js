@@ -1,12 +1,16 @@
 import express from "express"
-import UserRouter from "./routes/user.routes.js"
+import UsersRouter from "./routes/user.routes.js"
 import InstitutionsRouter from "./routes/institution.routes.js"
+import AdministratorsRouter from "./routes/administrator.routes.js"
+import StudyUnitsRouter from "./routes/studyUnit.routes.js"
 
 
 const ApiRouter = express.Router()
 
-ApiRouter.use("/users", UserRouter)
+ApiRouter.use("/users", UsersRouter)
 ApiRouter.use("/institutions", InstitutionsRouter)
+ApiRouter.use("/administrators", AdministratorsRouter)
+ApiRouter.use("/studyunit", StudyUnitsRouter)
 
 
 export default ApiRouter
