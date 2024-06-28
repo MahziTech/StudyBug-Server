@@ -10,7 +10,7 @@ const ApiRouter = express.Router()
 ApiRouter.use("/users", UsersRouter)
 ApiRouter.use("/institutions", InstitutionsRouter)
 ApiRouter.use("/administrators", AdministratorsRouter)
-ApiRouter.use("/studyunit", StudyUnitsRouter)
+ApiRouter.use("/studyunits", StudyUnitsRouter)
 
 
 export default ApiRouter

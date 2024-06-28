@@ -1,4 +1,5 @@
 import StudyUnitDatabase from "../models/studyUnit.models.js";
+import UserDatabase from "../models/user.models.js";
 import { getPagination } from "../services/query.services.js";
 
 
@@ -34,7 +35,8 @@ export const createStudyUnit = async(req, res) => {
 export const getStudyUnitById = async(req, res) => {
     try {
         const { id } = req.params
-        const studyUnit = StudyUnitDatabase.findById(id)
+        console.log(id)
+        const studyUnit = await StudyUnitDatabase.findById(id)
 
         if(studyUnit) {
             return res.status(200).json({ ok: true, body: studyUnit })
@@ -52,11 +54,16 @@ export const getUserStudyUnits = async(req, res) => {
         const { skip, limit, page } = getPagination(req.query)
         const { userId } = req.params
 
-        const studyUnits = StudyUnitDatabase.find({ user: userId }, { __v: 0 })
+        const user = await UserDatabase.findById(userId)
+        if(!user) {
+            return res.status(409).json({ ok: false, error: "The user could not be found" })
+        }
+
+        const studyUnits = await StudyUnitDatabase.find({ user: userId }, { __v: 0 })
         .skip(skip)
         .limit(limit)
 
-        const totalResults = StudyUnitDatabase.countDocuments({ user: userId })
+        const totalResults = await StudyUnitDatabase.countDocuments({ user: userId })
 
         return res.status(200).json({
             ok: true,
@@ -74,10 +81,15 @@ export const getUserStudyUnits = async(req, res) => {
 export const changeStudyUnitName = async(req, res) => {
     try {
         const { id, newName } = req.body
-        const studyUnit = StudyUnitDatabase.findById(id)
+        const studyUnit = await StudyUnitDatabase.findById(id)
 
         if(!studyUnit) {
             return res.status(404).json({ ok: false, error: "Study unit could not be found" })
+        }
+
+        const existingStudyUnit = await StudyUnitDatabase.findOne({ name: newName })
+        if(existingStudyUnit) {
+            return res.status(409).json({ ok: false, error: "You already have a study unit with that same name. try a different name :)" })
         }
 
         studyUnit.name = newName
@@ -89,3 +101,20 @@ export const changeStudyUnitName = async(req, res) => {
         return res.status(500).json({ ok: false, error: "Internal server error" })
     }
 }
+
+export const deleteStudyUnit = async (req, res) => {
+    const { id } = req.params;
+
+    try {
+        const deletedStudyUnit = await StudyUnitDatabase.findByIdAndDelete(id);
+
+        if (!deletedStudyUnit) {
+            return res.status(404).json({ ok: false, error: 'Study Unit not found' });
+        }
+
+        return res.status(200).json({ ok: true, body: deletedStudyUnit });
+    } catch (error) {
+        console.log(error)
+        return res.status(500).json({ ok: false, error: "Internal server error" });
+    }
+};
