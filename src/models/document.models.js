@@ -9,7 +9,7 @@ const DocumentSchema = mongoose.Schema({
         min: 1,
         max: 100
     },
-    filePath: {
+    fileType: {
         type: String,
         default: "",
         required: true

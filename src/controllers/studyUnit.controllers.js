@@ -15,7 +15,7 @@ export const createStudyUnit = async(req, res) => {
         const user = await UserDatabase.findById(userId)
 
         if(!user) {
-            return res.status(409).json({ ok: false, error: "The user could not be found" })
+            return res.status(404).json({ ok: false, error: "The user could not be found" })
         }
 
         const newStudyUnit = new StudyUnitDatabase({
@@ -56,7 +56,7 @@ export const getUserStudyUnits = async(req, res) => {
 
         const user = await UserDatabase.findById(userId)
         if(!user) {
-            return res.status(409).json({ ok: false, error: "The user could not be found" })
+            return res.status(404).json({ ok: false, error: "The user could not be found" })
         }
 
         const studyUnits = await StudyUnitDatabase.find({ user: userId }, { __v: 0 })
@@ -95,7 +95,7 @@ export const changeStudyUnitName = async(req, res) => {
         studyUnit.name = newName
         await studyUnit.save()
 
-        return res.status(200).json({ ok: true, body: studyUnit }) //!MAKE SURE THIS WORKS AS OPPOSED TO FETCHING THE STUDYUNIT AGAIN AND RETURNING THAT
+        return res.status(200).json({ ok: true, body: studyUnit })
     } catch (error) {
         console.log(error)
         return res.status(500).json({ ok: false, error: "Internal server error" })
@@ -117,4 +117,4 @@ export const deleteStudyUnit = async (req, res) => {
         console.log(error)
         return res.status(500).json({ ok: false, error: "Internal server error" });
     }
-};
+}
