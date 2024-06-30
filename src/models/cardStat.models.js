@@ -2,9 +2,9 @@ import mongoose from "mongoose";
 
 
 const CardStatSchema = mongoose.Schema({
-    flashCardSet: {
+    flashcardSet: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: "FlashCardSet",
+        ref: "FlashcardSet",
         default: null,
         required: true
     },

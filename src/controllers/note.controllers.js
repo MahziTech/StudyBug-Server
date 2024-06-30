@@ -19,7 +19,7 @@ export const createNote = async(req, res) => {
         }
 
         if(studyUnitId) {
-            const studyUnit = await StudyUnitDatabase.findById(studyUnitId)
+            const studyUnit = await StudyUnitDatabase.findOne({ _id: studyUnitId, user: userId })
             if(!studyUnit) {
                 return res.status(404).json({ ok: false, error: "The study unit could not be found" })
             }
@@ -131,16 +131,23 @@ export const updateNoteContent = async(req, res) => {
 
 export const moveNoteToStudyUnit = async(req, res) => {
     try {
-        const { noteId, studyUnitId } = req.body
+        const { userId, noteId, studyUnitId } = req.body
+
+        const user = await UserDatabase.findById(userId)
+        if(!user) {
+            return res.status(404).json({ ok: false, error: "The user could not be found" })
+        }
 
         const note = await NoteDatabase.findById(noteId)
         if(!note) {
             return res.status(404).json({ ok: false, error: "Note could not be found" })
         }
 
-        const studyUnit = await StudyUnitDatabase.findById(studyUnitId)
-        if(!studyUnit) {
-            return res.status(404).json({ ok: false, error: "The study unit could not be found" })
+        if(studyUnitId) {
+            const studyUnit = await StudyUnitDatabase.findOne({ _id: studyUnitId, user: userId })
+            if(!studyUnit) {
+                return res.status(404).json({ ok: false, error: "The study unit could not be found" })
+            }
         }
 
         note.studyUnit = studyUnitId

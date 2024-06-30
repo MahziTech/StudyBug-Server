@@ -18,7 +18,6 @@ const DocumentSchema = mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: "StudyUnit",
         default: null,
-        required: true
     },
     user: {
         type: mongoose.Schema.Types.ObjectId,

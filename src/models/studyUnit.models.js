@@ -14,6 +14,10 @@ const StudyUnitSchema = mongoose.Schema({
         ref: "User",
         default: null,
         required: true
+    },
+    picturePath: {
+        type: String,
+        default: "",
     }
 }, { timestamps: true })
 

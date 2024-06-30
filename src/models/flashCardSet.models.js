@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 
 
-const FlashCardSetSchema = mongoose.Schema({
+const FlashcardSetSchema = mongoose.Schema({
     name: {
         type: String,
         default: "",
@@ -18,7 +18,6 @@ const FlashCardSetSchema = mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: "StudyUnit",
         default: null,
-        required: true
     },
     user: {
         type: mongoose.Schema.Types.ObjectId,
@@ -29,5 +28,5 @@ const FlashCardSetSchema = mongoose.Schema({
 }, { timestamps: true })
 
 
-const FlashCardSet = mongoose.model("FlashCardSet", FlashCardSetSchema)
-export default FlashCardSet
+const FlashcardSet = mongoose.model("FlashcardSet", FlashcardSetSchema)
+export default FlashcardSet

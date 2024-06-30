@@ -3,7 +3,7 @@ import StudyUnitDatabase from "../models/studyUnit.models.js";
 import UserDatabase from "../models/user.models.js";
 import { getPagination } from "../services/query.services.js";
 
-//todo: handle file upload and deletion
+//todo: handle file upload, rename and deletion
 
 export const createDocument = async(req, res) => {
     try {
@@ -87,7 +87,7 @@ export const getUserDocuments = async(req, res) => {
     }
 }
 
-export const changeDocumentName = async(req, res) => { // more complicated than this. modifying the name excluding extension
+export const changeDocumentName = async(req, res) => { // more complicated than this. name field will be displayed to client. keep original file name or rename by Id for flexible filePath
     try {
         const { id, newName } = req.body
         const document = await DocumentDatabase.findById(id)
@@ -111,37 +111,25 @@ export const changeDocumentName = async(req, res) => { // more complicated than 
     }
 }
 
-export const updateDocumentContent = async(req, res) => {
-    try {
-        const { id, updatedContent } = req.body
-        const document = await DocumentDatabase.findById(id)
-
-        if(!document) {
-            return res.status(404).json({ ok: false, error: "Document could not be found" })
-        }
-
-        document.content = updatedContent
-        await document.save()
-
-        return res.status(200).json({ ok: true, body: document })
-    } catch (error) {
-        console.log(error)
-        return res.status(500).json({ ok: false, error: "Internal server error" })
-    }
-}
-
 export const moveDocumentToStudyUnit = async(req, res) => {
     try {
-        const { documentId, studyUnitId } = req.body
+        const { userId, documentId, studyUnitId } = req.body
 
+        const user = await UserDatabase.findById(userId)
+        if(!user) {
+            return res.status(404).json({ ok: false, error: "The user could not be found" })
+        }
+        
         const document = await DocumentDatabase.findById(documentId)
         if(!document) {
             return res.status(404).json({ ok: false, error: "Document could not be found" })
         }
 
-        const studyUnit = await StudyUnitDatabase.findById(studyUnitId)
-        if(!studyUnit) {
-            return res.status(404).json({ ok: false, error: "The study unit could not be found" })
+        if(studyUnitId) {
+            const studyUnit = await StudyUnitDatabase.findOne({ _id: studyUnitId, user: userId })
+            if(!studyUnit) {
+                return res.status(404).json({ ok: false, error: "The study unit could not be found" })
+            }
         }
 
         document.studyUnit = studyUnitId

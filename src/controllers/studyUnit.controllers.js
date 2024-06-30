@@ -2,6 +2,9 @@ import StudyUnitDatabase from "../models/studyUnit.models.js";
 import UserDatabase from "../models/user.models.js";
 import { getPagination } from "../services/query.services.js";
 
+//todo: create picturepath upload and change
+//todo: get all studyunit resources
+//todo: search and get all resources
 
 export const createStudyUnit = async(req, res) => {
     try {
