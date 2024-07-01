@@ -5,6 +5,7 @@ import {
     createFlashcardSet,
     deleteCardFromFlashcardSet,
     deleteFlashcardSet,
+    editCardInFlashcardSet,
     getFlashcardSetById,
     getUserFlashcardSets,
     moveFlashcardSetToStudyUnit
@@ -19,8 +20,9 @@ FlashcardSetsRouter.get("/id/:id", getFlashcardSetById)
 FlashcardSetsRouter.get("/user/:userId", getUserFlashcardSets)
 FlashcardSetsRouter.post("/edit/name", changeFlashcardSetName)
 FlashcardSetsRouter.post("/edit/studyunit", moveFlashcardSetToStudyUnit)
-FlashcardSetsRouter.post("/cards/add", addCardsToFlashcardSet)
 FlashcardSetsRouter.post("/cards/remove", deleteCardFromFlashcardSet)
+FlashcardSetsRouter.post("/cards/edit", editCardInFlashcardSet)
+FlashcardSetsRouter.put("/cards/add", addCardsToFlashcardSet)
 FlashcardSetsRouter.delete("/delete/:id", deleteFlashcardSet)
 
 

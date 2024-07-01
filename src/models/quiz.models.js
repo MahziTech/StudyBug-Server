@@ -1,6 +1,20 @@
 import mongoose from "mongoose";
 
 
+const QuestionSchema = mongoose.Schema({
+    questionPrompt: {
+        type: String,
+        required: true,
+    },
+    type: {
+        type: String, // multiple choice, true/false or subjective
+        required: true
+    },
+    options: {
+        type: Array
+    }
+})
+
 const QuizSchema = mongoose.Schema({
     name: {
         type: String,
@@ -22,7 +36,7 @@ const QuizSchema = mongoose.Schema({
         required: true
     },
     questions: {
-        type: Array,
+        type: [QuestionSchema],
         default: [],
         required: true
     }

@@ -1,7 +1,7 @@
-import { nanoid } from "nanoid";
 import FlashcardSetDatabase from "../models/flashCardSet.models.js";
 import StudyUnitDatabase from "../models/studyUnit.models.js";
 import UserDatabase from "../models/user.models.js";
+import { getPagination } from "../services/query.services.js";
 
 
 export const createFlashcardSet = async(req, res) => {
@@ -109,6 +109,37 @@ export const changeFlashcardSetName = async(req, res) => {
     }
 }
 
+export const moveFlashcardSetToStudyUnit = async(req, res) => {
+    try {
+        const { userId, flashcardSetId, studyUnitId } = req.body
+
+        const user = await UserDatabase.findById(userId)
+        if(!user) {
+            return res.status(404).json({ ok: false, error: "The user could not be found" })
+        }
+
+        const flashcardSet = await FlashcardSetDatabase.findById(flashcardSetId)
+        if(!flashcardSet) {
+            return res.status(404).json({ ok: false, error: "FlashcardSet could not be found" })
+        }
+
+        if(studyUnitId) {
+            const studyUnit = await StudyUnitDatabase.findOne({ _id: studyUnitId, user: userId })
+            if(!studyUnit) {
+                return res.status(404).json({ ok: false, error: "The study unit could not be found" })
+            }
+        }
+
+        flashcardSet.studyUnit = studyUnitId
+        const updatedFlashcardSet = await flashcardSet.save()
+
+        return res.status(200).json({ ok: true, body: updatedFlashcardSet })
+    } catch (error) {
+        console.log(error)
+        return res.status(500).json({ ok: false, error: "Internal server error" })
+    }
+}
+
 export const addCardsToFlashcardSet = async(req, res) => {
     try {
         const { id, cards } = req.body
@@ -156,31 +187,26 @@ export const deleteCardFromFlashcardSet = async(req, res) => {
     }
 }
 
-export const moveFlashcardSetToStudyUnit = async(req, res) => {
+export const editCardInFlashcardSet = async(req, res) => {
     try {
-        const { userId, flashcardSetId, studyUnitId } = req.body
-
-        const user = await UserDatabase.findById(userId)
-        if(!user) {
-            return res.status(404).json({ ok: false, error: "The user could not be found" })
-        }
+        const { cardId, flashcardSetId, update: { question, answer } } = req.body
 
         const flashcardSet = await FlashcardSetDatabase.findById(flashcardSetId)
         if(!flashcardSet) {
             return res.status(404).json({ ok: false, error: "FlashcardSet could not be found" })
         }
 
-        if(studyUnitId) {
-            const studyUnit = await StudyUnitDatabase.findOne({ _id: studyUnitId, user: userId })
-            if(!studyUnit) {
-                return res.status(404).json({ ok: false, error: "The study unit could not be found" })
-            }
+        const targetCard = flashcardSet.cards.id(cardId)
+        if(!targetCard) {
+            return res.status(404).json({ ok: false, error: "The card you want to update could not be found" })
         }
 
-        flashcardSet.studyUnit = studyUnitId
-        const updatedFlashcardSet = await flashcardSet.save()
+        if(question) targetCard.question = question
+        if(answer) targetCard.answer = answer
 
-        return res.status(200).json({ ok: true, body: updatedFlashcardSet })
+        await flashcardSet.save()
+
+        return res.status(200).json({ ok: true, body: flashcardSet })
     } catch (error) {
         console.log(error)
         return res.status(500).json({ ok: false, error: "Internal server error" })
@@ -201,26 +227,5 @@ export const deleteFlashcardSet = async (req, res) => {
     } catch (error) {
         console.log(error)
         return res.status(500).json({ ok: false, error: "Internal server error" });
-    }
-}
-
-export const editCardInFlashcardSet = async(req, res) => {
-    try {
-        const { cardId, flashcardSetId, update: { question, answer } } = req.body
-
-        const flashcardSet = await FlashcardSetDatabase.findById(flashcardSetId)
-        if(!flashcardSet) {
-            return res.status(404).json({ ok: false, error: "FlashcardSet could not be found" })
-        }
-
-        const targetCard = flashcardSet.cards.id(cardId)
-        if(!targetCard) {
-            return res.status(404).json({ ok: false, error: "The card you want to update could not be found" })
-        }
-
-
-    } catch (error) {
-        console.log(error)
-        return res.status(500).json({ ok: false, error: "Internal server error" })
     }
 }

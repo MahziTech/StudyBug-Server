@@ -6,6 +6,7 @@ import StudyUnitsRouter from "./routes/studyUnit.routes.js"
 import NotesRouter from "./routes/note.routes.js"
 import DocumentsRouter from "./routes/document.routes.js"
 import FlashcardSetsRouter from "./routes/flashcardSet.routes.js"
+import CardStatsRouter from "./routes/cardStat.routes.js"
 
 
 const ApiRouter = express.Router()
@@ -17,6 +18,7 @@ ApiRouter.use("/studyunits", StudyUnitsRouter)
 ApiRouter.use("/notes", NotesRouter)
 ApiRouter.use("/documents", DocumentsRouter)
 ApiRouter.use("/flashcardsets", FlashcardSetsRouter)
+ApiRouter.use("/cardstats", CardStatsRouter)
 
 
 export default ApiRouter

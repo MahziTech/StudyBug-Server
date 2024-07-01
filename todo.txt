@@ -8,3 +8,5 @@ store some sort of user activity data
 file uploads limit
 ADD MIDDLEWARE FOR CASCADING DELETES IN EACH NEEDED MODEL
 ask frontend what data they need after signing up and in
+come up with an analysis format to generate statistics
+cascade DELETES for studyUnits, flashcardsets, quizes
