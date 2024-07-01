@@ -1,16 +1,25 @@
 import mongoose from "mongoose";
 
+const FlashcardSchema = mongoose.Schema({
+    question: {
+        type: String,
+        required: true
+    },
+    answer: {
+        type: String,
+        required: true
+    }
+}, { timestamps: true });
 
 const FlashcardSetSchema = mongoose.Schema({
     name: {
         type: String,
-        default: "",
         required: true,
         min: 1,
         max: 150
     },
     cards: {
-        type: Array,
+        type: [FlashcardSchema],
         default: [],
         required: true,
     },
@@ -22,7 +31,6 @@ const FlashcardSetSchema = mongoose.Schema({
     user: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "User",
-        default: null,
         required: true
     }
 }, { timestamps: true })
