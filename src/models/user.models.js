@@ -7,12 +7,14 @@ const UserSchema = mongoose.Schema({
         default: "",
         min: 2,
         max: 50,
+        trim: true
     },
     lastName: {
         type: String,
         default: "",
         min: 2,
         max: 50,
+        trim: true
 
     },
     email: {
@@ -33,6 +35,7 @@ const UserSchema = mongoose.Schema({
         default: "",
         min: 5,
         max: 20,
+        trim: true
     },
     oauthProvider: {
         type: String,

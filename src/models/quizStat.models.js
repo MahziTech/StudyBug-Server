@@ -1,5 +1,19 @@
 import mongoose from "mongoose";
 
+const DetailSchema = mongoose.Schema({
+    question: {
+        type: Object,
+        required: true
+    },
+    userAnswer: {
+        type: String,
+        required: true
+    },
+    isAnswerCorrect: {
+        type: Boolean,
+        required: true
+    }
+})
 
 const QuizStatSchema = mongoose.Schema({
     user: {
@@ -14,7 +28,7 @@ const QuizStatSchema = mongoose.Schema({
         default: null,
     },
     details: {
-        type: Array,
+        type: [DetailSchema],
         default: [],
         required: true
     },

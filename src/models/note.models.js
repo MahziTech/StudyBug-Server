@@ -7,7 +7,8 @@ const NoteSchema = mongoose.Schema({
         default: "",
         required: true,
         min: 1,
-        max: 150
+        max: 150,
+        trim: true
     },
     content: {
         type: String,

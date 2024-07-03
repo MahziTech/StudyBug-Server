@@ -1,6 +1,8 @@
 file/image storage with S3
-auth and session  (use oauthflow.txt)
-ai
+auth and session  (use ./oauthflow.txt)
+AI: 
+    -user provides options for how the quizes would be i.e difficulty, type(mixture?), length
+    -ways to analyse stats
 oauth/ssi/sso
 tests
 define various subscription levels

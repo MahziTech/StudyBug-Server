@@ -7,7 +7,8 @@ const DocumentSchema = mongoose.Schema({
         default: "",
         required: true,
         min: 1,
-        max: 100
+        max: 100,
+        trim: true
     },
     fileType: {
         type: String,

@@ -7,7 +7,8 @@ const StudyUnitSchema = mongoose.Schema({
         default: "",
         required: true,
         min: 1,
-        max: 100
+        max: 100, 
+        trim: true
     },
     user: {
         type: mongoose.Schema.Types.ObjectId,

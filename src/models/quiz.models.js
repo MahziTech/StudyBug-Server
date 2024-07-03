@@ -29,6 +29,10 @@ const QuizSchema = mongoose.Schema({
         default: null,
         required: true
     },
+    info: {
+        type: Object,
+        required: true,
+    },
     studyUnit: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "StudyUnit",

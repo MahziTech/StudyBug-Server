@@ -3,11 +3,13 @@ import mongoose from "mongoose";
 const FlashcardSchema = mongoose.Schema({
     question: {
         type: String,
-        required: true
+        required: true,
+        trim: true
     },
     answer: {
         type: String,
-        required: true
+        required: true,
+        trim: true
     }
 }, { timestamps: true });
 
@@ -16,7 +18,8 @@ const FlashcardSetSchema = mongoose.Schema({
         type: String,
         required: true,
         min: 1,
-        max: 150
+        max: 150,
+        trim: true
     },
     cards: {
         type: [FlashcardSchema],
