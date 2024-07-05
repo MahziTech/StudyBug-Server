@@ -1,6 +1,9 @@
+import mongoose from "mongoose"
 import InstitutionDatabase from "../models/institution.models.js";
 import UserDatabase from "../models/user.models.js";
 import bcrypt from "bcrypt"
+import { getPagination } from "../services/query.services.js";
+
 
 
 //todo: DO EDITUSER SUBSCRIPTION, PASSWORD, PICTURE
@@ -162,5 +165,96 @@ export const removeUserFromInstitution = async(req, res) => {
     } catch (error) {
         console.log(error)
         return res.status(500).json({ ok: false, error: "Internal server error" })
+    }
+}
+
+export const searchFilterAndSortAllResources = async (req, res) => {
+    try {
+        const {
+            userId,
+            studyUnitId,
+            searchQuery,
+            resourceType,
+            minDate,
+            maxDate,
+            sortByDate  
+        } = req.body
+
+        const { skip, limit, page } = getPagination({ limit: req.body.limit, page: req.body.page })
+        // Base match stage
+        const matchStage = { user: new mongoose.Types.ObjectId(userId) }
+
+        if (studyUnitId) matchStage.studyUnit = new mongoose.Types.ObjectId(studyUnitId)
+        if (searchQuery) matchStage.name = { $regex: searchQuery, $options: 'i' }
+        if (minDate || maxDate) {
+            matchStage.createdAt = {}
+            if (minDate) matchStage.createdAt.$gte = new Date(minDate)
+            if (maxDate) matchStage.createdAt.$lte = new Date(maxDate)
+        }
+
+        // Determine which collections to query
+        let collections = []
+        if (!resourceType || resourceType === 'all') {
+            collections = ['flashcardsets', 'notes', 'documents']
+        } else {
+            switch (resourceType) {
+                case 'flashcards': collections = ['flashcardsets']; break;
+                case 'notes': collections = ['notes']; break;
+                case 'documents': collections = ['documents']; break;
+                default: return res.status(400).json({ ok: false, error: 'Invalid resourceType' });
+            }
+        }
+
+        // Prepare sort object
+        const sortField = sortByDate ? 'createdAt' : 'name'
+        const sortObj = { [sortField]: (!sortByDate || sortByDate === 'asc') ? 1 : -1 }
+
+        // Aggregation pipeline
+        const pipeline = [
+            { $match: matchStage },
+            { $addFields: { resourceType: { $literal: 'flashcardset' } } },
+            {
+                $unionWith: {
+                    coll: 'notes',
+                    pipeline: [
+                        { $match: matchStage },
+                        { $addFields: { resourceType: { $literal: 'note' } } }
+                    ]
+                }
+            },
+            {
+                $unionWith: {
+                    coll: 'documents',
+                    pipeline: [
+                        { $match: matchStage },
+                        { $addFields: { resourceType: { $literal: 'document' } } }
+                    ]
+                }
+            },
+            { $match: { resourceType: { $in: collections.map(c => c.slice(0, -1)) } } },
+            { $sort: sortObj },
+            {
+                $facet: {
+                    metadata: [{ $count: 'totalResults' }],
+                    data: [{ $skip: skip }, { $limit: limit }]
+                }
+            }
+        ]
+
+        const [result] = await mongoose.model('FlashcardSet').aggregate(pipeline)
+
+        const totalResults = result.metadata[0]?.totalResults || 0
+        const totalPages = Math.ceil(totalResults / limit)
+
+        return res.status(200).json({
+            ok: true,
+            body: result.data,
+            page,
+            totalPages,
+            totalResults
+        })
+
+    } catch (error) {
+        return res.status(500).json({ ok: false, error: 'Internal Server error', message: error.message })
     }
 }

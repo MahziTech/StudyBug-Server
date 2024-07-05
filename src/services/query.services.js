@@ -1,6 +1,6 @@
 const DEFAULT_PAGE_NUMBER = 1;
 const DEFAULT_PAGE_LIMIT = 10;
-const MAX_PAGE_LIMIT = 25;
+const MAX_PAGE_LIMIT = 20;
 
 export const getPagination = (query) => {
   const page = Math.abs(query.page) || DEFAULT_PAGE_NUMBER;
@@ -8,6 +8,11 @@ export const getPagination = (query) => {
   if(limit > MAX_PAGE_LIMIT) limit = DEFAULT_PAGE_LIMIT
   const skip = (page - 1) * limit;
 
+  console.log({
+    skip,
+    limit,
+    page
+  })
   return {
     skip,
     limit,

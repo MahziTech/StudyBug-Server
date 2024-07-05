@@ -27,9 +27,33 @@ app.use("/api", ApiRouter)
 
 const PORT = process.env.PORT || 6001
 
+const mongooseConnectionOptions = {
+    socketTimeoutMS: 45000, 
+    serverSelectionTimeoutMS: 50000, 
+}
 
-mongoose.connect(process.env.MONGO_URL, { socketTimeoutMS: 45000, serverSelectionTimeoutMS: 50000 }).then(app.listen(PORT, () => {
-    console.log("connected to mongo database")
-    console.log("server running at PORT: " + PORT)
-}))
-.catch(err => console.log("\nFAILED TO CONNECT TO DATABASE\n" + err))
+
+mongoose.connect(process.env.MONGO_URL, mongooseConnectionOptions)
+
+mongoose.connection.on('connected', () => {
+    console.log("Connected to MongoDB")
+    app.listen(PORT, () => {
+        console.log("Server running at PORT: " + PORT)
+        // listCollections() 
+    })
+})
+
+mongoose.connection.on('error', (err) => {
+    console.log("\nFAILED TO CONNECT TO DATABASE\n" + err)
+})
+
+async function listCollections() {
+    try {
+        const db = mongoose.connection.db
+        console.log("tha db", db)
+        const collections = db.listCollections()
+        console.log("Collections:", collections.map(collection => "herrree"+ collection.name))
+    } catch (err) {
+        console.error('Error listing collections', err)
+    }
+}
