@@ -4,6 +4,7 @@ auth and session  (use ./oauthflow.txt)
 AI: 
     -user provides options for how the quizes would be i.e difficulty, type(mixture?), length
     -ways to analyse stats
+https with signed SSL certificates once domain arrives 
 oauth/ssi/sso
 tests
 define various subscription levels
