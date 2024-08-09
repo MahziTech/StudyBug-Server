@@ -21,7 +21,8 @@ const QuizSchema = mongoose.Schema({
         default: "",
         required: true,
         min: 1,
-        max: 150
+        max: 150,
+        trim: true
     },
     user: {
         type: mongoose.Schema.Types.ObjectId,

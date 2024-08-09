@@ -22,7 +22,8 @@ const UserSchema = mongoose.Schema({
         required: true,
         min: 8,
         max: 50,
-        unique: true
+        unique: true,
+        trim: true
     },
     password: {
         type: String,
@@ -54,6 +55,13 @@ const UserSchema = mongoose.Schema({
         ref: "Institution",
         default: null,
     },
+    tokens: [
+        {
+            token: { required: true, type: String },
+        },
+    ],
+    resetPasswordToken: String,
+    resetPasswordTokenExpiry: Date,
 }, { timestamps: true })
 
 

@@ -23,6 +23,16 @@ app.get("/", (req, res) => {
     res.send("Welcome to StudyBug...")
 })
 
+app.use((req, res, next) => {
+    const referer = req.headers['referer'];
+    const origin = req.headers['origin'];
+  
+    console.log('Referer:', referer);  // Logs the full URL of the referring page
+    console.log('Origin:', origin);    // Logs the origin (scheme + host + port) of the request
+  
+    next();
+  });
+
 app.use("/api", ApiRouter)
 
 const PORT = process.env.PORT || 6001

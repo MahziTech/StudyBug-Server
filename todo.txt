@@ -1,3 +1,4 @@
+users can use app without having an account/signing in. but data won't be saved. also restricted to some features
 file/image storage with S3
 auth and session  (use ./oauthflow.txt)
 AI: 

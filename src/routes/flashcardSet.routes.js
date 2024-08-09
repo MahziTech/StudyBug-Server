@@ -9,7 +9,7 @@ import {
     getFlashcardSetById,
     getUserFlashcardSets,
     moveFlashcardSetToStudyUnit
-} from "../controllers/flashCardSet.controllers.js"
+} from "../controllers/flashcardSet.controllers.js"
 
 
 const FlashcardSetsRouter = express.Router()

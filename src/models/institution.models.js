@@ -4,11 +4,13 @@ import mongoose from "mongoose";
 const InstitutionSchema = mongoose.Schema({
     name: {
         type: String,
-        default: ""
+        default: "",
+        trim: true
     },
     address: {
         type: String,
-        default: ""
+        default: "",
+        trim: true
     },
     password: {
         type: String,
@@ -22,7 +24,8 @@ const InstitutionSchema = mongoose.Schema({
         required: true,
         min: 8,
         max: 50,
-        unique: true
+        unique: true,
+        trim: true
     },
     profilePicturePath: {
         type: String,
