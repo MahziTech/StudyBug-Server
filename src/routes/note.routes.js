@@ -16,7 +16,7 @@ const NotesRouter = express.Router()
 
 NotesRouter.post("/create", createNote)
 NotesRouter.get("/id/:id", getNoteById)
-NotesRouter.get("/user/:userId", getUserNotes)
+NotesRouter.get("/user/all", getUserNotes)
 NotesRouter.post("/edit/name", changeNoteName)
 NotesRouter.post("/edit/content", updateNoteContent)
 NotesRouter.post("/edit/studyunit", moveNoteToStudyUnit)

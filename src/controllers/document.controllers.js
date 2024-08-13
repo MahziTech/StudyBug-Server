@@ -1,6 +1,5 @@
 import DocumentDatabase from "../models/document.models.js";
 import StudyUnitDatabase from "../models/studyUnit.models.js";
-import UserDatabase from "../models/user.models.js";
 import { getPagination } from "../services/query.services.js";
 
 //todo: handle file upload, rename and deletion
@@ -9,18 +8,13 @@ export const createDocument = async(req, res) => {
     try {
         const { name, userId, studyUnitId } = req.body
 
-        const existingDocument = await DocumentDatabase.findOne({ name })
+        const existingDocument = await DocumentDatabase.findOne({ name, user: userId })
         if(existingDocument) {
             return res.status(404).json({ ok: false, error: "You already have a document with that same name. try a different name :)" })
         }
 
-        const user = await UserDatabase.findById(userId)
-        if(!user) {
-            return res.status(404).json({ ok: false, error: "The user could not be found" })
-        }
-
         if(studyUnitId) {
-            const studyUnit = await StudyUnitDatabase.findById(studyUnitId)
+            const studyUnit = await StudyUnitDatabase.findOne({ _id: studyUnitId, user: userId })
             if(!studyUnit) {
                 return res.status(404).json({ ok: false, error: "The study unit could not be found" })
             }
@@ -45,7 +39,7 @@ export const createDocument = async(req, res) => {
 export const getDocumentById = async(req, res) => {
     try {
         const { id } = req.params
-        const document = await DocumentDatabase.findById(id)
+        const document = await DocumentDatabase.findOne({ _id: id, user: req.body.userId })
 
         if(document) {
             return res.status(200).json({ ok: true, body: document })
@@ -61,12 +55,7 @@ export const getDocumentById = async(req, res) => {
 export const getUserDocuments = async(req, res) => {
     try {
         const { skip, limit, page } = getPagination(req.query)
-        const { userId } = req.params
-
-        const user = await UserDatabase.findById(userId)
-        if(!user) {
-            return res.status(404).json({ ok: false, error: "The user could not be found" })
-        }
+        const { userId } = req.body
 
         const documents = await DocumentDatabase.find({ user: userId }, { __v: 0 })
         .skip(skip)
@@ -89,14 +78,14 @@ export const getUserDocuments = async(req, res) => {
 
 export const changeDocumentName = async(req, res) => { // more complicated than this. name field will be displayed to client. keep original file name or rename by Id for flexible filePath
     try {
-        const { id, newName } = req.body
-        const document = await DocumentDatabase.findById(id)
+        const { id, userId, newName } = req.body
+        const document = await DocumentDatabase.findOne({ _id: id, user: userId })
 
         if(!document) {
             return res.status(404).json({ ok: false, error: "Document could not be found" })
         }
 
-        const existingDocument = await DocumentDatabase.findOne({ name: newName })
+        const existingDocument = await DocumentDatabase.findOne({ name: newName, user: userId })
         if(existingDocument) {
             return res.status(409).json({ ok: false, error: "You already have a document with that same name. try a different name :)" })
         }
@@ -114,13 +103,8 @@ export const changeDocumentName = async(req, res) => { // more complicated than 
 export const moveDocumentToStudyUnit = async(req, res) => {
     try {
         const { userId, documentId, studyUnitId } = req.body
-
-        const user = await UserDatabase.findById(userId)
-        if(!user) {
-            return res.status(404).json({ ok: false, error: "The user could not be found" })
-        }
         
-        const document = await DocumentDatabase.findById(documentId)
+        const document = await DocumentDatabase.findOne({ _id: documentId, user: userId})
         if(!document) {
             return res.status(404).json({ ok: false, error: "Document could not be found" })
         }
@@ -146,7 +130,7 @@ export const deleteDocument = async (req, res) => {
     const { id } = req.params;
 
     try {
-        const deletedDocument = await DocumentDatabase.findByIdAndDelete(id);
+        const deletedDocument = await DocumentDatabase.findByOneAndDelete({ _id: id, user: req.body.userId });
 
         if (!deletedDocument) {
             return res.status(404).json({ ok: false, error: 'Document not found' });

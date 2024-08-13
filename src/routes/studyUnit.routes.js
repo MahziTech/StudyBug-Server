@@ -13,7 +13,7 @@ const StudyUnitsRouter = express.Router()
 
 StudyUnitsRouter.post("/create", createStudyUnit)
 StudyUnitsRouter.get("/id/:id", getStudyUnitById)
-StudyUnitsRouter.get("/user/:userId", getUserStudyUnits)
+StudyUnitsRouter.get("/user/all", getUserStudyUnits)
 StudyUnitsRouter.post("/edit", changeStudyUnitName)
 StudyUnitsRouter.delete("/delete/:id", deleteStudyUnit)
 

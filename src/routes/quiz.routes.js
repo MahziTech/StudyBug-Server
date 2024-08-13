@@ -14,7 +14,7 @@ const QuizzesRouter = express.Router()
 
 QuizzesRouter.post("/create", createQuiz)
 QuizzesRouter.get("/id/:id", getQuizById)
-QuizzesRouter.get("/user/:userId", getAllUserQuizzes)
+QuizzesRouter.get("/user/all", getAllUserQuizzes)
 QuizzesRouter.post("/edit/name", changeQuizName)
 QuizzesRouter.post("/edit/studyunit", moveQuizToStudyUnit)
 QuizzesRouter.delete("/delete/:id", deleteQuiz)

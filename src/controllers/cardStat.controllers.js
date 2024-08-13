@@ -1,5 +1,4 @@
 import CardStatDatabase from "../models/cardStat.models.js";
-import UserDatabase from "../models/user.models.js";
 import FlashcardSetDatabase from "../models/flashCardSet.models.js";
 
 
@@ -7,12 +6,7 @@ export const createCardStat = async(req, res) => {
     try {
         const { flashcardSetId, userId,  question, answer, correctlyAnswered } = req.body
 
-        const user = await UserDatabase.findById(userId)
-        if(!user) {
-            return res.status(404).json({ ok: false, error: "The user could not be found" })
-        }
-
-        const flashcardSet = await FlashcardSetDatabase.findById(flashcardSetId)
+        const flashcardSet = await FlashcardSetDatabase.findOne({ _id: flashcardSetId, user: userId})
         if(!flashcardSet) {
             return res.status(404).json({ ok: false, error: "FlashcardSet could not be found" })
         }

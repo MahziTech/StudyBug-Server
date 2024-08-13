@@ -6,7 +6,8 @@ import bcrypt from "bcrypt"
 import { generateUserAccessToken, generateUserRefreshToken } from "../utils/auth.utils.js";
 dotenv.config()
 
-const rtknExpiry = new Date(Date.now() + (1 * 60 * 1000))
+const raw = parseInt(process.env.REFRESH_TOKEN_EXPIRY.slice(0, -1))
+const rtknExpiry = new Date(Date.now() + (raw * 60 * 1000))
 const REFRESH_TOKEN_CONSTANTS = {
     secret: process.env.REFRESH_TOKEN_SECRET,
     cookie: {
@@ -26,6 +27,9 @@ export const createUserDefault = async(req, res) => {
     try {
         const { email, password } = req.body
 
+        if(!email || password.length < 1) { //!CHANGE BACK TO 8CHARS IN PRODUCTION
+            return res.status(400).json({ ok: false, error: "unacceptable credentials" })
+        }
         const existingUser = await UserDatabase.findOne({ email: email })
 
         if(existingUser) {
@@ -64,7 +68,6 @@ export const createUserDefault = async(req, res) => {
 export const loginUserDefault = async(req, res) => {
     try {
         const { email, password } = req.body
-
         const user = await UserDatabase.findOne({ email })
         if(!user) {
             return res.status(404).json({ ok: false, error: "Invalid Email or Password" })
@@ -184,11 +187,10 @@ export const refreshAccessToken = async(req, res) => {
         })
     } catch (error) {
         console.log(error)
-
         if(error?.name === "JsonWebTokenError") {
             return res.status(400).json({ ok: false, error: "Token error. you are unauthenticated" })
         }
-        
+
         return res.status(500).json({ ok: false, error: "Internal server error" })
     }
 }

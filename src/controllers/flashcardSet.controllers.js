@@ -1,6 +1,5 @@
 import FlashcardSetDatabase from "../models/flashCardSet.models.js";
 import StudyUnitDatabase from "../models/studyUnit.models.js";
-import UserDatabase from "../models/user.models.js";
 import { getPagination } from "../services/query.services.js";
 
 
@@ -8,14 +7,9 @@ export const createFlashcardSet = async(req, res) => {
     try {
         const { name, cards, studyUnitId, userId } = req.body
 
-        const existingFlashcardSet = await FlashcardSetDatabase.findOne({ name })
+        const existingFlashcardSet = await FlashcardSetDatabase.findOne({ name, user: userId })
         if(existingFlashcardSet) {
             return res.status(409).json({ ok: false, error: "You already have a set of flashcards with that same name. try a different name :)" })
-        }
-
-        const user = await UserDatabase.findById(userId)
-        if(!user) {
-            return res.status(404).json({ ok: false, error: "The user could not be found" })
         }
 
         if(studyUnitId) {
@@ -45,7 +39,7 @@ export const getFlashcardSetById = async(req, res) => {
     try {
         const { id } = req.params
 
-        const flashcardSet = await FlashcardSetDatabase.findById(id)
+        const flashcardSet = await FlashcardSetDatabase.findOne({ _id: id, user: req.body.userId })
         if(flashcardSet) {
             return res.status(200).json({ ok: true, body: flashcardSet })
         }
@@ -60,12 +54,8 @@ export const getFlashcardSetById = async(req, res) => {
 export const getUserFlashcardSets = async(req, res) => {
     try {
         const { skip, limit, page } = getPagination(req.query)
-        const { userId } = req.params
-        const user = await UserDatabase.findById(userId)
-        if(!user) {
-            return res.status(404).json({ ok: false, error: "The user could not be found" })
-        }
-
+        const { userId } = req.body
+        
         const flashcardSets = await FlashcardSetDatabase.find({ user: userId })
         .skip(skip)
         .limit(limit)
@@ -87,18 +77,18 @@ export const getUserFlashcardSets = async(req, res) => {
 
 export const changeFlashcardSetName = async(req, res) => {
     try {
-        const { id, newName } = req.body
-        const flashcardSet = await FlashcardSetDatabase.findById(id)
+        const { id, userId, newName } = req.body
+        const flashcardSet = await FlashcardSetDatabase.findOne({ _id: id, user: userId })
 
         if(!flashcardSet) {
             return res.status(404).json({ ok: false, error: "FlashcardSet could not be found" })
         }
-
-        const existingFlashcardSet = await FlashcardSetDatabase.findOne({ name: newName })
+        
+        const existingFlashcardSet = await FlashcardSetDatabase.findOne({ name: newName, user: userId })
         if(existingFlashcardSet) {
             return res.status(409).json({ ok: false, error: "You already have a flashcardSet with that same name. try a different name :)" })
         }
-
+        
         flashcardSet.name = newName
         await flashcardSet.save()
 
@@ -113,12 +103,7 @@ export const moveFlashcardSetToStudyUnit = async(req, res) => {
     try {
         const { userId, flashcardSetId, studyUnitId } = req.body
 
-        const user = await UserDatabase.findById(userId)
-        if(!user) {
-            return res.status(404).json({ ok: false, error: "The user could not be found" })
-        }
-
-        const flashcardSet = await FlashcardSetDatabase.findById(flashcardSetId)
+        const flashcardSet = await FlashcardSetDatabase.findOne({ _id: flashcardSetId, user: userId})
         if(!flashcardSet) {
             return res.status(404).json({ ok: false, error: "FlashcardSet could not be found" })
         }
@@ -142,9 +127,9 @@ export const moveFlashcardSetToStudyUnit = async(req, res) => {
 
 export const addCardsToFlashcardSet = async(req, res) => {
     try {
-        const { id, cards } = req.body
+        const { id, userId, cards } = req.body
 
-        const flashcardSet = await FlashcardSetDatabase.findById(id)
+        const flashcardSet = await FlashcardSetDatabase.findOne({ _id: id, user: userId })
         if(!flashcardSet) {
             return res.status(404).json({ ok: false, error: "FlashcardSet could not be found" })
         }
@@ -165,9 +150,9 @@ export const addCardsToFlashcardSet = async(req, res) => {
 
 export const deleteCardFromFlashcardSet = async(req, res) => {
     try {
-        const { flashcardSetId, cardId } = req.body
+        const { flashcardSetId, cardId, userId } = req.body
 
-        const flashcardSet = await FlashcardSetDatabase.findById(flashcardSetId)
+        const flashcardSet = await FlashcardSetDatabase.findOne({ _id: flashcardSetId, user: userId })
         if(!flashcardSet) {
             return res.status(404).json({ ok: false, error: "FlashcardSet could not be found" })
         }
@@ -189,9 +174,9 @@ export const deleteCardFromFlashcardSet = async(req, res) => {
 
 export const editCardInFlashcardSet = async(req, res) => {
     try {
-        const { cardId, flashcardSetId, update: { question, answer } } = req.body
+        const { cardId, userId, flashcardSetId, update: { question, answer } } = req.body
 
-        const flashcardSet = await FlashcardSetDatabase.findById(flashcardSetId)
+        const flashcardSet = await FlashcardSetDatabase.findOne({ _id: flashcardSetId, user: userId})
         if(!flashcardSet) {
             return res.status(404).json({ ok: false, error: "FlashcardSet could not be found" })
         }
@@ -217,7 +202,7 @@ export const deleteFlashcardSet = async (req, res) => {
     const { id } = req.params;
 
     try {
-        const deletedflashcardSet = await FlashcardSetDatabase.findByIdAndDelete(id);
+        const deletedflashcardSet = await FlashcardSetDatabase.findOneAndDelete({ _id: id, user: req.body.userId });
 
         if (!deletedflashcardSet) {
             return res.status(404).json({ ok: false, error: 'flashcardSet not found' });

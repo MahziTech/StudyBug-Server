@@ -14,7 +14,7 @@ const DocumentsRouter = express.Router()
 
 DocumentsRouter.post("/create", createDocument)
 DocumentsRouter.get("/id/:id", getDocumentById)
-DocumentsRouter.get("/user/:userId", getUserDocuments)
+DocumentsRouter.get("/user/all", getUserDocuments)
 DocumentsRouter.post("/edit/name", changeDocumentName)
 DocumentsRouter.post("/edit/studyunit", moveDocumentToStudyUnit)
 DocumentsRouter.delete("/delete/:id", deleteDocument)

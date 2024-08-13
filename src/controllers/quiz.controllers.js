@@ -1,20 +1,16 @@
 import QuizDatabase from "../models/quiz.models.js";
 import UserDatabase from "../models/user.models.js";
 import StudyUnitDatabase from "../models/studyUnit.models.js";
+import { getPagination } from "../services/query.services.js";
 
 
 export const createQuiz = async(req, res) => {
     try {
         const { userId, studyUnitId, info, name, questions} = req.body
 
-        const existingQuiz = await QuizDatabase.findOne({ name })
+        const existingQuiz = await QuizDatabase.findOne({ name, user: userId })
         if(existingQuiz) {
             return res.status(409).json({ ok: false, error: "You already have a quiz with that same name. try a different name :)" })
-        }
-
-        const user = await UserDatabase.findById(userId)
-        if(!user) {
-            return res.status(404).json({ ok: false, error: "The user could not be found" })
         }
 
         if(studyUnitId) {
@@ -44,7 +40,7 @@ export const getQuizById = async(req, res) => {
     try {
         const { id } = req.params
 
-        const quiz = await QuizDatabase.findById(id)
+        const quiz = await QuizDatabase.findOne({ _id: id, user: req.body.userId })
         if(quiz) {
             return res.status(200).json({ ok: true, body: quiz })
         }
@@ -57,14 +53,22 @@ export const getQuizById = async(req, res) => {
 
 export const getAllUserQuizzes = async(req, res) => {
     try {
-        const { userId } = req.params
-        const user = await UserDatabase.findById(userId)
-        if(!user) {
-            return res.status(404).json({ ok: false, error: "The user could not be found" })
-        }
+        const { skip, limit, page } = getPagination(req.query)
+        const { userId } = req.body
 
-        const quizzes = await QuizDatabase.find({ user: userId })
-        return res.status(200).json({ ok: true, body: quizzes })
+        const quizzes = await QuizDatabase.find({ user: userId }, { __v: 0 })
+        .skip(skip)
+        .limit(limit)
+
+        const totalResults = await QuizDatabase.countDocuments({ user: userId })
+
+        return res.status(200).json({
+            ok: true,
+            page,
+            totalResults,
+            body: quizzes,
+            totalPages: Math.ceil(totalResults/limit)
+        })
     } catch (error) {
         console.log(error)
         return res.status(500).json({ ok: false, error: "Internal server error" })
@@ -73,14 +77,14 @@ export const getAllUserQuizzes = async(req, res) => {
 
 export const changeQuizName = async(req, res) => {
     try {
-        const { id, newName } = req.body
-        const quiz = await QuizDatabase.findById(id)
+        const { id, userId, newName } = req.body
+        const quiz = await QuizDatabase.findOne({ _id: id, user: userId })
 
         if(!quiz) {
             return res.status(404).json({ ok: false, error: "Quiz could not be found" })
         }
 
-        const existingQuiz = await QuizDatabase.findOne({ name: newName })
+        const existingQuiz = await QuizDatabase.findOne({ name: newName, user: userId })
         if(existingQuiz) {
             return res.status(409).json({ ok: false, error: "You already have a quiz with that same name. try a different name :)" })
         }
@@ -99,12 +103,7 @@ export const moveQuizToStudyUnit = async(req, res) => {
     try {
         const { userId, quizId, studyUnitId } = req.body
 
-        const user = await UserDatabase.findById(userId)
-        if(!user) {
-            return res.status(404).json({ ok: false, error: "The user could not be found" })
-        }
-
-        const quiz = await QuizDatabase.findById(quizId)
+        const quiz = await QuizDatabase.findOne({ _id: quizId, user: userId })
         if(!quiz) {
             return res.status(404).json({ ok: false, error: "The Quiz could not be found" })
         }
@@ -130,7 +129,7 @@ export const deleteQuiz = async (req, res) => {
     const { id } = req.params;
 
     try {
-        const deletedQuiz = await QuizDatabase.findByIdAndDelete(id);
+        const deletedQuiz = await QuizDatabase.findOneAndDelete({ _id: id, user: req.body.userId });
 
         if (!deletedQuiz) {
             return res.status(404).json({ ok: false, error: 'quiz not found' });

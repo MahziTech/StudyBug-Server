@@ -17,7 +17,7 @@ const FlashcardSetsRouter = express.Router()
 
 FlashcardSetsRouter.post("/create", createFlashcardSet)
 FlashcardSetsRouter.get("/id/:id", getFlashcardSetById)
-FlashcardSetsRouter.get("/user/:userId", getUserFlashcardSets)
+FlashcardSetsRouter.get("/user/all", getUserFlashcardSets)
 FlashcardSetsRouter.post("/edit/name", changeFlashcardSetName)
 FlashcardSetsRouter.post("/edit/studyunit", moveFlashcardSetToStudyUnit)
 FlashcardSetsRouter.post("/cards/remove", deleteCardFromFlashcardSet)

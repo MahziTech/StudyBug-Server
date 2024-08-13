@@ -18,9 +18,7 @@ import { getPagination } from "../services/query.services.js";
 
 export const getUser = async(req, res) => {
     try {
-        const { id } = req.params
-
-        const user = await UserDatabase.findById(id, { __v: 0, password: 0, tokens: 0, resetPasswordTokenExpiry: 0, resetPasswordToken: 0 })
+        const user = await UserDatabase.findById(req.body.userId, { __v: 0, _id: 0, password: 0, tokens: 0, resetPasswordTokenExpiry: 0, resetPasswordToken: 0 })
         if(user) {
             return res.status(200).json({ ok: true, body: user });
         }
@@ -34,9 +32,9 @@ export const getUser = async(req, res) => {
 
 export const editUserMainDetails = async(req, res) => {
     try {
-        const { id, updates } = req.body
+        const { userId, updates } = req.body
         const allowedFields = ["firstName", "lastName", "telephone"]
-        const user = await UserDatabase.findById(id)
+        const user = await UserDatabase.findById(userId)
 
         if(!user) {
             return res.status(404).json({ ok: false, "error": "The user could not be found" })
@@ -53,7 +51,7 @@ export const editUserMainDetails = async(req, res) => {
 
         await user.save()
 
-        const updatedUser = await UserDatabase.findById(id, { __v: 0, password: 0, tokens: 0, resetPasswordTokenExpiry: 0, resetPasswordToken: 0 })
+        const updatedUser = await UserDatabase.findById(userId, { __v: 0, _id: 0, password: 0, tokens: 0, resetPasswordTokenExpiry: 0, resetPasswordToken: 0 })
         return res.status(200).json({ ok: true, body: updatedUser })
     } catch (error) {
         console.log(error)

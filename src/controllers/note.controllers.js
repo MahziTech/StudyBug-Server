@@ -1,6 +1,5 @@
 import NoteDatabase from "../models/note.models.js";
 import StudyUnitDatabase from "../models/studyUnit.models.js";
-import UserDatabase from "../models/user.models.js";
 import { getPagination } from "../services/query.services.js";
 
 
@@ -8,14 +7,9 @@ export const createNote = async(req, res) => {
     try {
         const { name, userId, content, studyUnitId } = req.body
 
-        const existingNote = await NoteDatabase.findOne({ name })
+        const existingNote = await NoteDatabase.findOne({ name, user: userId })
         if(existingNote) {
             return res.status(409).json({ ok: false, error: "You already have a note with that same name. try a different name :)" })
-        }
-
-        const user = await UserDatabase.findById(userId)
-        if(!user) {
-            return res.status(404).json({ ok: false, error: "The user could not be found" })
         }
 
         if(studyUnitId) {
@@ -44,7 +38,7 @@ export const createNote = async(req, res) => {
 export const getNoteById = async(req, res) => {
     try {
         const { id } = req.params
-        const note = await NoteDatabase.findById(id)
+        const note = await NoteDatabase.findOne({ _id: id, user: req.body.userId })
 
         if(note) {
             return res.status(200).json({ ok: true, body: note })
@@ -60,12 +54,7 @@ export const getNoteById = async(req, res) => {
 export const getUserNotes = async(req, res) => {
     try {
         const { skip, limit, page } = getPagination(req.query)
-        const { userId } = req.params
-
-        const user = await UserDatabase.findById(userId)
-        if(!user) {
-            return res.status(404).json({ ok: false, error: "The user could not be found" })
-        }
+        const { userId } = req.body
 
         const notes = await NoteDatabase.find({ user: userId }, { __v: 0 })
         .skip(skip)
@@ -88,14 +77,14 @@ export const getUserNotes = async(req, res) => {
 
 export const changeNoteName = async(req, res) => {
     try {
-        const { id, newName } = req.body
-        const note = await NoteDatabase.findById(id)
+        const { id, userId, newName } = req.body
+        const note = await NoteDatabase.findOne({ _id: id, user: userId })
 
         if(!note) {
             return res.status(404).json({ ok: false, error: "Note could not be found" })
         }
 
-        const existingNote = await NoteDatabase.findOne({ name: newName })
+        const existingNote = await NoteDatabase.findOne({ name: newName, user: userId })
         if(existingNote) {
             return res.status(409).json({ ok: false, error: "You already have a note with that same name. try a different name :)" })
         }
@@ -112,8 +101,8 @@ export const changeNoteName = async(req, res) => {
 
 export const updateNoteContent = async(req, res) => {
     try {
-        const { id, updatedContent } = req.body
-        const note = await NoteDatabase.findById(id)
+        const { id, userId, updatedContent } = req.body
+        const note = await NoteDatabase.findOne({ _id: id, user: userId })
 
         if(!note) {
             return res.status(404).json({ ok: false, error: "Note could not be found" })
@@ -133,12 +122,7 @@ export const moveNoteToStudyUnit = async(req, res) => {
     try {
         const { userId, noteId, studyUnitId } = req.body
 
-        const user = await UserDatabase.findById(userId)
-        if(!user) {
-            return res.status(404).json({ ok: false, error: "The user could not be found" })
-        }
-
-        const note = await NoteDatabase.findById(noteId)
+        const note = await NoteDatabase.findOne({ _id: noteId, user: userId })
         if(!note) {
             return res.status(404).json({ ok: false, error: "Note could not be found" })
         }
@@ -164,7 +148,7 @@ export const deleteNote = async (req, res) => {
     const { id } = req.params;
 
     try {
-        const deletedNote = await NoteDatabase.findByIdAndDelete(id);
+        const deletedNote = await NoteDatabase.findOneAndDelete({ _id: id, user: req.body.userId });
 
         if (!deletedNote) {
             return res.status(404).json({ ok: false, error: 'Note not found' });

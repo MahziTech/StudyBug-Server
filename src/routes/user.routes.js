@@ -1,21 +1,18 @@
 import express from "express"
 import {
     addUserToInstitution,
-    createUser, 
     editUserMainDetails, 
     getUser, 
-    loginUser,
     removeUserFromInstitution,
     searchFilterAndSortAllResources,
 } from "../controllers/user.controllers.js"
+import { checkAuthentication } from "../middlewares/auth.middlewares.js"
 
 
 const UsersRouter = express.Router()
 
 
-UsersRouter.post("/create", createUser)
-UsersRouter.post("/login", loginUser)
-UsersRouter.get("/id/:id", getUser)
+UsersRouter.get("/id/:id", checkAuthentication, getUser)
 UsersRouter.get("/resources", searchFilterAndSortAllResources)
 UsersRouter.post("/edit/main-details", editUserMainDetails)
 UsersRouter.post("/edit/institution/add", addUserToInstitution)

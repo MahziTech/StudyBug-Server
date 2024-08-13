@@ -8,6 +8,7 @@ dotenv.config()
 export const checkAuthentication = async(req, res, next) => {
     try {
         const authHeader = req.header("Authorization")
+        console.log(authHeader)
         if(!authHeader?.startsWith("Bearer ")) {
             return res.status(401).json({ ok: false, error: "You are unauthenticated" })
         }
@@ -16,11 +17,14 @@ export const checkAuthentication = async(req, res, next) => {
         const decoded = jwt.verify(accessToken, process.env.ACCESS_TOKEN_SECRET)
         console.log("DECODED: ", decoded)
 
-        req.decodedUserId = decoded._id
+        req.body.userId = decoded._id
         req.token = accessToken
         next()
     } catch (error) {
         console.log(error)
-        return res.status(400).json({ ok: false, error: "Invalid Access Token" })
+        if(error.name === "TokenExpiredError") {
+            return res.status(400).json({ ok: false, error: "Token expired" })
+        }
+        return res.status(400).json({ ok: false, error: "Invalid Token" })
     }
 }

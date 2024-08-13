@@ -9,17 +9,10 @@ export const createStudyUnit = async(req, res) => {
     try {
         const { name, userId } = req.body
 
-        const existingStudyUnit = await StudyUnitDatabase.findOne({ name })
+        const existingStudyUnit = await StudyUnitDatabase.findOne({ name, user: userId })
         if(existingStudyUnit) {
             return res.status(409).json({ ok: false, error: "You already have a study unit with that same name. try a different name :)" })
         }
-
-        const user = await UserDatabase.findById(userId)
-
-        if(!user) {
-            return res.status(404).json({ ok: false, error: "The user could not be found" })
-        }
-
         const newStudyUnit = new StudyUnitDatabase({
             name,
             user: userId
@@ -37,8 +30,7 @@ export const createStudyUnit = async(req, res) => {
 export const getStudyUnitById = async(req, res) => {
     try {
         const { id } = req.params
-        console.log(id)
-        const studyUnit = await StudyUnitDatabase.findById(id)
+        const studyUnit = await StudyUnitDatabase.findOne({ _id: id, user: req.body.userId })
 
         if(studyUnit) {
             return res.status(200).json({ ok: true, body: studyUnit })
@@ -54,12 +46,7 @@ export const getStudyUnitById = async(req, res) => {
 export const getUserStudyUnits = async(req, res) => {
     try {
         const { skip, limit, page } = getPagination(req.query)
-        const { userId } = req.params
-
-        const user = await UserDatabase.findById(userId)
-        if(!user) {
-            return res.status(404).json({ ok: false, error: "The user could not be found" })
-        }
+        const { userId } = req.body
 
         const studyUnits = await StudyUnitDatabase.find({ user: userId }, { __v: 0 })
         .skip(skip)
@@ -82,14 +69,14 @@ export const getUserStudyUnits = async(req, res) => {
 
 export const changeStudyUnitName = async(req, res) => {
     try {
-        const { id, newName } = req.body
-        const studyUnit = await StudyUnitDatabase.findById(id)
+        const { id, userId, newName } = req.body
+        const studyUnit = await StudyUnitDatabase.findOne({ _id: id, user: userId })
 
         if(!studyUnit) {
             return res.status(404).json({ ok: false, error: "Study unit could not be found" })
         }
 
-        const existingStudyUnit = await StudyUnitDatabase.findOne({ name: newName })
+        const existingStudyUnit = await StudyUnitDatabase.findOne({ name: newName, user: userId })
         if(existingStudyUnit) {
             return res.status(409).json({ ok: false, error: "You already have a study unit with that same name. try a different name :)" })
         }
@@ -108,7 +95,7 @@ export const deleteStudyUnit = async (req, res) => {
     const { id } = req.params
 
     try {
-        const deletedStudyUnit = await StudyUnitDatabase.findByIdAndDelete(id)
+        const deletedStudyUnit = await StudyUnitDatabase.findOneAndDelete({ _id: id, user: req.body.userId })
 
         if (!deletedStudyUnit) {
             return res.status(404).json({ ok: false, error: 'Study Unit not found' })
