@@ -1,5 +1,6 @@
 import dotenv from "dotenv"
 import jwt from "jsonwebtoken"
+import UserDatabase from "../models/user.models.js"
 dotenv.config()
 
 
@@ -17,6 +18,11 @@ export const checkAuthentication = async(req, res, next) => {
         const decoded = jwt.verify(accessToken, process.env.ACCESS_TOKEN_SECRET)
         console.log("DECODED: ", decoded)
 
+        const user = await UserDatabase.findById(decoded._id)
+
+        if(!user) {
+            return res.status(404).json({ ok: false, error: "User does not exist" })
+        }
         req.body.userId = decoded._id
         req.token = accessToken
         next()

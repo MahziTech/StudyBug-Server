@@ -101,7 +101,7 @@ export const loginUserDefault = async(req, res) => {
 //!test if the accesstoken is still valid after logout since we didnot destrouy it
 export const logout = async(req, res) => {
     try {
-        const userId = req.decodedUserId
+        const userId = req.body.userId
         const user = await UserDatabase.findById(userId)
         if(!user) {
             return res.status(400).json({ ok: false, error: "user not found. you are not authenticated" })
@@ -156,11 +156,10 @@ export const logoutAllDevices = async(req, res) => {
     }
 }
 
-//!findout what happens if you submit an expired access token(does it know it's expired,can it differentiate from a tampered accesstoken)
-//!so that you can also make sure an access token is provided before refreshing it
 export const refreshAccessToken = async(req, res) => {
     try {
         const cookies = req.cookies
+        console.log(cookies)
         const refreshToken = cookies[REFRESH_TOKEN_CONSTANTS.cookie.name]
 
         if(!refreshToken) {
@@ -194,3 +193,4 @@ export const refreshAccessToken = async(req, res) => {
         return res.status(500).json({ ok: false, error: "Internal server error" })
     }
 }
+

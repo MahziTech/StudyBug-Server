@@ -6,17 +6,16 @@ import {
     removeUserFromInstitution,
     searchFilterAndSortAllResources,
 } from "../controllers/user.controllers.js"
-import { checkAuthentication } from "../middlewares/auth.middlewares.js"
 
 
 const UsersRouter = express.Router()
 
 
-UsersRouter.get("/id/:id", checkAuthentication, getUser)
+UsersRouter.get("/me", getUser)
 UsersRouter.get("/resources", searchFilterAndSortAllResources)
 UsersRouter.post("/edit/main-details", editUserMainDetails)
 UsersRouter.post("/edit/institution/add", addUserToInstitution)
-UsersRouter.post("/edit/institution/remove/:userId", removeUserFromInstitution)
+UsersRouter.post("/edit/institution/remove/user", removeUserFromInstitution)
 
 
 export default UsersRouter
