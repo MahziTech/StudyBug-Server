@@ -47,3 +47,8 @@ export async function generateResetToken() {
         resetPasswordTokenExpiry: Date.now() + (process.env.RESET_PASSWORD_TOKEN_EXPIRY_MINS||5)*60*1000
     }
 }
+
+export function isValidEmail(email) {
+    const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    return emailPattern.test(email);
+}

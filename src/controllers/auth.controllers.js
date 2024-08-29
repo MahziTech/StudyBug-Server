@@ -3,7 +3,7 @@ import jwt from "jsonwebtoken"
 import crypto from "crypto"
 import UserDatabase from "../models/user.models.js";
 import bcrypt from "bcrypt"
-import { generateUserAccessToken, generateUserRefreshToken } from "../utils/auth.utils.js";
+import { generateUserAccessToken, generateUserRefreshToken, isValidEmail } from "../utils/auth.utils.js";
 dotenv.config()
 
 const raw = parseInt(process.env.REFRESH_TOKEN_EXPIRY.slice(0, -1))
@@ -27,7 +27,7 @@ export const createUserDefault = async(req, res) => {
     try {
         const { email, password } = req.body
 
-        if(!email || password.length < 1) { //!CHANGE BACK TO 8CHARS IN PRODUCTION
+        if(!isValidEmail(email) || password.length < 1) { //!CHANGE BACK TO 8CHARS IN PRODUCTION
             return res.status(400).json({ ok: false, error: "unacceptable credentials" })
         }
         const existingUser = await UserDatabase.findOne({ email: email })
