@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StudyBug test client</title>
+    <link rel="stylesheet" href="index.css">
+</head>
+<body>
+    <div class="main">
+        <div class="input">
+
+            <div class="request-type">
+                <h4>Select request type</h2>
+                <input type="radio" id="GET" name="request_type" value="GET">
+                <label for="GET">GET</label>
+    
+                <input type="radio" id="POST" name="request_type" value="POST">
+                <label for="POST">POST</label>
+    
+                <input type="radio" id="PUT" name="request_type" value="PUT">
+                <label for="PUT">PUT</label>
+    
+                <input type="radio" id="PATCH" name="request_type" value="PATCH">
+                <label for="PATCH">PATCH</label>
+    
+                <input type="radio" id="DELETE" name="request_type" value="DELETE">
+                <label for="DELETE">DELETE</label>
+            </div>
+
+            <p class="error">Invalid JSON</p>
+            <div class="form">
+                <input type="text" name="url" id="url" placeholder="input url">
+            
+                <textarea name="body-content" id="body" placeholder="input body content"></textarea>
+                <div class="btn">SEND</div>
+            </div>
+            
+        </div>
+            
+        <div class="output">
+            <div class="target"></div>
+        </div>
+    </div>
+    <script src="index.js"></script>
+</body>
+</html>

@@ -3,8 +3,23 @@ import jwt from "jsonwebtoken"
 import UserDatabase from "../models/user.models.js"
 dotenv.config()
 
+const raw = parseInt(process.env.REFRESH_TOKEN_EXPIRY.slice(0, -1))
+const rtknExpiry = new Date(Date.now() + (raw * 60 * 1000))
+const REFRESH_TOKEN_CONSTANTS = {
+    secret: process.env.REFRESH_TOKEN_SECRET,
+    cookie: {
+        name: "rTkn",
+        options: {
+            sameSite: "None",
+            secure: true,
+            httpOnly: false,
+            expires: rtknExpiry
+        }
+    }
+}
 
-// should we modify it to make sure bboth access and refresh token are present ?????
+
+//! should i modify it to make sure bboth access and refresh token are present ?????
 
 export const checkAuthentication = async(req, res, next) => {
     try {
@@ -32,5 +47,37 @@ export const checkAuthentication = async(req, res, next) => {
             return res.status(400).json({ ok: false, error: "Token expired" })
         }
         return res.status(400).json({ ok: false, error: "Invalid Token" })
+    }
+}
+
+export const isLoggedInOnCurrentWebDevice = async(req, res) => {
+    try {
+        const cookies = req.cookies
+        console.log(cookies)
+        const refreshToken = cookies[REFRESH_TOKEN_CONSTANTS.cookie.name]
+
+        if(!refreshToken) {
+            next()
+        }
+
+        //! test with wrong rtkns and see
+        const decodedRefreshToken = jwt.verify(refreshToken, REFRESH_TOKEN_CONSTANTS.secret)
+        const refreshTokenHash = crypto.createHmac("sha256", REFRESH_TOKEN_CONSTANTS.secret)
+            .update(refreshToken)
+            .digest("hex")
+        
+        const userWithRTkn = await UserDatabase.findOne({ _id: decodedRefreshToken._id, "tokens.token": refreshTokenHash })
+        if(userWithRTkn) {
+            return res.status(400).json({ ok: false, error: "You are already logged in" })
+        } else {
+            next()
+        }
+    } catch (error) {
+        console.log(error)
+        if(["TokenExpiredError", "JsonWebTokenError"].includes(error.name)) {
+            console.log("valid error: ", error.name, " receieved. user not logged in")
+            next()
+        }
+        return res.status(500).json({ ok: false, error: "Internal server error" })
     }
 }

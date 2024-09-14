@@ -6,22 +6,20 @@ import dotenv from "dotenv"
 import helmet from "helmet";
 import morgan from "morgan";
 import ApiRouter from "./api.js";
+import cookieParser from "cookie-parser";
 
 
 dotenv.config()
 const app = express()
+app.disable("x-powered-by");
 app.use(express.json())
 app.use(helmet())
 app.use(helmet.crossOriginResourcePolicy({ policy: "cross-origin" }))
 app.use(morgan("common"))
+app.use(cookieParser())
 app.use(bodyParser.json({ limit: "30mb", extended: true }))
 app.use(bodyParser.urlencoded({ limit: "30mb", extended: true }))
 app.use(cors())
-
-
-app.get("/", (req, res) => {
-    res.send("Welcome to StudyBug...")
-})
 
 app.use((req, res, next) => {
     const referer = req.headers['referer'];
@@ -31,7 +29,13 @@ app.use((req, res, next) => {
     console.log('Origin:', origin);    // Logs the origin (scheme + host + port) of the request
   
     next();
-  });
+})
+
+
+app.get("/", (req, res) => {
+    res.send("Welcome to StudyBug...")
+})
+
 
 app.use("/api", ApiRouter)
 
