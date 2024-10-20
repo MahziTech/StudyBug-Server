@@ -39,7 +39,7 @@ const UserSchema = mongoose.Schema({
         trim: true
     },
     oauthProvider: {
-        type: String,
+        type: Object,
         default: null,
     },
     profilePicturePath: {

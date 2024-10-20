@@ -27,7 +27,7 @@ export const createUserDefault = async(req, res) => {
     try {
         const { email, password } = req.body
 
-        if(!isValidEmail(email) || password.length < 1) { //!CHANGE BACK TO 8CHARS IN PRODUCTION
+        if(!isValidEmail(email) || password.length < 8) { //!CHANGE BACK TO 8CHARS IN PRODUCTION
             return res.status(400).json({ ok: false, error: "unacceptable credentials" })
         }
         const existingUser = await UserDatabase.findOne({ email: email })
@@ -51,7 +51,49 @@ export const createUserDefault = async(req, res) => {
 
             savedUser.tokens.push({ token: refreshTokenHash })
             await savedUser.save()
-            const { password, tokens, resetPasswordTokenExpiry, resetPasswordToken, ...userWithoutPassword } = savedUser.toObject();
+            const { password, tokens, resetPasswordTokenExpiry, resetPasswordToken, oauthProvider, ...userWithoutPassword } = savedUser.toObject();
+            res.cookie(
+                REFRESH_TOKEN_CONSTANTS.cookie.name,
+                refreshToken,
+                REFRESH_TOKEN_CONSTANTS.cookie.options
+            )
+            return res.status(200).json({ ok: true, accessToken, body: userWithoutPassword });
+        }
+    } catch (error) {
+        console.log(error)
+        return res.status(500).json({ ok: false, error: "Internal server error" })
+    }
+}
+
+export const createUserGoogle = async(req, res) => {
+    try {
+        const { email, googleId, firstName, lastName, profilePicturePath } = req.body
+
+        if(!isValidEmail(email) || !googleId) { //!CHANGE BACK TO 8CHARS IN PRODUCTION
+            return res.status(400).json({ ok: false, error: "unacceptable credentials" })
+        }
+        const existingUser = await UserDatabase.findOne({ email: email })
+
+        if(existingUser) {
+            return res.status(409).json({ ok: false, error: "An account already exists with this email." })
+        }
+
+        const newUser = new UserDatabase({
+            email,
+            firstName: firstName || null,
+            lastName: lastName || null,
+            profilePicturePath: profilePicturePath || null,
+            oauthProvider: { name: "google", uniqueId: googleId },
+        })
+
+        const savedUser = await newUser.save()
+        if(savedUser) {
+            const accessToken = generateUserAccessToken(savedUser._id, savedUser.email)
+            const { refreshToken, refreshTokenHash } = await generateUserRefreshToken(savedUser._id)
+
+            savedUser.tokens.push({ token: refreshTokenHash })
+            await savedUser.save()
+            const { password, tokens, resetPasswordTokenExpiry, resetPasswordToken, oauthProvider, ...userWithoutPassword } = savedUser.toObject();
             res.cookie(
                 REFRESH_TOKEN_CONSTANTS.cookie.name,
                 refreshToken,
@@ -83,7 +125,7 @@ export const loginUserDefault = async(req, res) => {
             user.tokens.push({ token: refreshTokenHash })
             await user.save()
 
-            const { password, tokens, resetPasswordTokenExpiry, resetPasswordToken, ...userWithoutPassword } = user.toObject();
+            const { password, tokens, resetPasswordTokenExpiry, resetPasswordToken, oauthProvider, ...userWithoutPassword } = user.toObject();
 
             res.cookie(
                 REFRESH_TOKEN_CONSTANTS.cookie.name,
@@ -92,6 +134,35 @@ export const loginUserDefault = async(req, res) => {
             )
             return res.status(200).json({ ok: true, accessToken, body: userWithoutPassword });
         }
+    } catch (error) {
+        console.log(error)
+        return res.status(500).json({ ok: false, error: "Internal server error" })
+    }
+}
+
+export const loginUserGoogle = async(req, res) => {
+    try {
+        const { email, googleId } = req.body
+        const user = await UserDatabase.findOne({ email })
+
+
+        if(!user) return res.status(404).json({ ok: false, error: "No account exists with that email" })
+        if(user.oauthProvider?.name !== "google" || user.oauthProvider?.uniqueId !== googleId) return res.status(404).json({ ok: false, error: "Invalid OauthProvider details" })
+
+        const accessToken = generateUserAccessToken(user._id, user.email)
+        const { refreshToken, refreshTokenHash } = await generateUserRefreshToken(user._id)
+
+        user.tokens.push({ token: refreshTokenHash })
+        await user.save()
+
+        const { password, tokens, resetPasswordTokenExpiry, resetPasswordToken, oauthProvider, ...userWithoutPassword } = user.toObject();
+
+        res.cookie(
+            REFRESH_TOKEN_CONSTANTS.cookie.name,
+            refreshToken,
+            REFRESH_TOKEN_CONSTANTS.cookie.options
+        )
+        return res.status(200).json({ ok: true, accessToken, body: userWithoutPassword });
     } catch (error) {
         console.log(error)
         return res.status(500).json({ ok: false, error: "Internal server error" })
